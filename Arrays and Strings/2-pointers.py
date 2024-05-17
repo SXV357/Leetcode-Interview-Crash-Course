@@ -204,30 +204,106 @@ def reverseOnlyLetters(s: str) -> str:
     return "".join(chars) # O(n)
 
 def getCommon(nums1: list[int], nums2: list[int]) -> int:
+    """
+    Time complexity: O(n + m)
+    Space complexity: O(1) if we don't take into account the extra array created else O(n + m) since it is also possible that both the arrays are equal
+    Come back to this later to re-attempt
+    """
     # Trivial approach:
         # Convert both arrays into sets to get their intersection
         # Covert the intersection set back into an array and return the smallest element
     
     # Approach 1
-    intersection = set(nums1).intersection(set(nums2))
-    return min(list(intersection))
+    # intersection = set(nums1).intersection(set(nums2))
+    # return min(list(intersection))
 
-    # 2-pointer approach(try to make this work) **
-    # res = []
-    # i = j = 0
-    # while i < len(nums1) and j < len(nums2):
-    #     if nums1[i] != nums2[j]:
-    #         i += 1
-    #     else:
-    #         res.append(nums1[i])
-    #         i += 1
-    #         j += 1
+    # 2-pointer approach(Very similar to the problem regarding combining two sorted arrays into a sorted array)
+        # The process of combining involves comparing elements at both pointers and doing the following:
+            # If l < r then we add the left element and increment the left pointer
+            # If l > r then we add the right element and increment the right pointer
+            # If l = r then we add both elements and increment both pointers
+        # eventually we exhaust one array completely and then iterate over the remaining elements in the other used array and append them to the resulting array
+    common = []
+    i = j = 0
+    while i < len(nums1) and j < len(nums2):
+        # All the comparisons and operations(appending and incrementing) are O(1)
+        if nums1[i] < nums2[j]:
+            i += 1
+        elif nums1[i] > nums2[j]:
+            j += 1
+        else:
+            # Both arrays are sorted so once we encounter the first match we know it must be the smallest common element and we can directly return it
+            common.append(nums1[i])
+            i += 1
+            j += 1
     
-    # return min(res)
+    return min(common) if len(common) > 0 else -1 # return is O(n)
 
-# print(getCommon([1,2,3,6], [2,3,4,5]))
-# print(getCommon([1,2,3], [2, 4]))
+print(getCommon([1,2,3,6], [2,3,4,5]))
+print(getCommon([1,2,3], [2, 4]))
 
 def moveZeroes(nums: list[int]) -> None:
-    # base cases(just one element)
-    pass
+    """
+    Come back to this later to re-attempt
+    """
+    # Trivial approach
+        # Filter out all non-zero elements into a separate array
+        # Extend that array by how many ever zero elements exist
+        # Update the array parameter to point to the new array
+    
+    # Extra space solution 1
+    # non_zero = list(filter(lambda num: num != 0, nums)) # O(n)
+    # non_zero.extend([0] * (len(nums) - len(non_zero))) # O(1) because the 0's are just being appended to the list
+    # nums[:] = non_zero # in-place modification: O(n) because all elements are being updated once again
+
+    # Extra space solution 2
+    # modified = [0] * len(nums)
+    # i = 0
+    # for j in range(len(nums)):
+    #     if nums[j] != 0:
+    #         modified[i] = nums[j]
+    #         i += 1
+    # nums[:] = modified
+
+    # In-place solution
+    # Time complexity: O(n), Space complexity: O(1) - No use of any extra space or variables
+    # nums[:] = list(filter(lambda item: item != 0, nums)) + list(filter(lambda item: item == 0, nums))
+
+    # Better solution
+        # We can re-interpret the problem as asking to move all non-zero elments to the beginning of the array followed by moving all zero elements to the end
+
+    curr = 0 # This pointer is used to keep a track of the position of the last non-zero element
+    for i in range(len(nums)):
+        if nums[i] != 0:
+            nums[curr] = nums[i] # curr starts at 0 and is incremented after we add a non-zero element because we are shifting all non-zero elements to the front of the array
+            curr += 1 # incremented so that the next time we find a non-zero element we can place it in the next adjacent spot after the previous one
+    
+    # Algorithm walkthrough(Really does the same as iterating through the array from start to end, finding the non-zero elements and adding them to the beginning of the same array instead of using extra space
+        # Input: [0, 1, 0, 3, 12], curr = 0
+        # nums[i] = 0, skip
+        # nums[i] = 1 -> nums[0] = 1, curr = 1
+        # nums[i] = 0, skip
+        # nums[i] = 3, nums[1] = 3, curr = 2
+        # nums[i] = 12, nums[2] = 12, curr = 3
+        # final: [1, 3, 12, 3, 12] and curr is at 3 right now so we can iterate from curr till the end of the array filling everything with zero
+    
+    while curr < len(nums): # at this point all non-zero elements have been added to the start of the array and we have reference to the index from which
+        # point onwards we start adding all zero's so we have the loop to do that here
+        nums[curr] = 0
+        curr += 1
+    
+def reversePrefix(word: str, ch: str) -> str:
+    """
+    Time complexity: O(n) - convert string to array of characters, for actual reversal can be O(n)
+    in worst case if the first occurrence of the character is at the very end of the string, and to join all characters back into a string
+    Space complexity: O(1) if we don't include the array of characters and O(n) otherwise
+    """
+    try:
+        l, r, chars = 0, word.index(ch), list(word)
+        while l < r:
+            chars[l], chars[r] = chars[r], chars[l] # swapping characters starting at the front and all the way until the index of the character keeping everything else untouched
+            l += 1
+            r -= 1
+        return "".join(chars)
+    except ValueError: # Catch block if ch doesn't exist in the word and return word right away
+        return word
