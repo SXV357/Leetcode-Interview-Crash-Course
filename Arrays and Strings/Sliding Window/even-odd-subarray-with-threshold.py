@@ -43,7 +43,7 @@ def check_conditions(arr: list[int], thresh: int) -> bool:
 
 def longestAlternatingSubarray(nums: list[int], threshold: int) -> int:
     """
-    COME BACK TO THIS LATER TO TRY SLIDING WINDOW APPROACH
+    The constraints are relatively small so brute force solution works. Would need to consider optimization for larger input sizes
     """
     # Brute force approach
 

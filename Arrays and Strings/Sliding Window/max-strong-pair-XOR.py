@@ -5,7 +5,7 @@ import unittest
 def maximumStrongPairXor(nums: list[int]) -> int:
     """
     XOR: evaluates to 1 only if exactly one of the bits is 1 and the other is 0
-    COME BACK TO THIS LATER TO TRY SLIDING WINDOW APPROACH
+    The input constraints are relatively small so brute forcing the solution works. For larger input sizes, it is better to consider the optimal solution
     """
     res = 0
 
@@ -32,5 +32,5 @@ class TestStrongPairXOR(unittest.TestCase):
     def test_single_element(self):
         self.assertEqual(maximumStrongPairXor([1]), 0) # length of array is 1
 
-# if __name__ == "__main__":
-#     unittest.main()
+if __name__ == "__main__":
+    unittest.main()
