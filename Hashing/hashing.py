@@ -167,6 +167,16 @@ def k_distinct(s: str, k: int) -> int:
     return res
 
 def intersection(nums: List[List[int]]) -> List[int]:
+    """
+    Approach 1: Brute force solution
+    - TC: `O(m * n^2 + mlogm)` - let's assume the length of nums[0] is `m` and the average length of all arrays after the first one is `n`. for the remaining `n - 1` arrays we are checking existence of a value which takes `O(n)` time hence we have the first part which is `m * n^2`. Then the sorting at the end also takes time and its `mlogm` because in thw worst case all the `m` elements in `nums[0]` appear in all the remaining `n - 1` arrays.
+    - SC: `O(m)` because the only data structure we're using that scales with input size is `res` and in cases where all the elements of `res` appear in all the other arrays we end up storing `m` elements overall
+    
+    Approach 2: Set solution
+    - TC: `O(n^n + nlogn)` - converting all the subarrays of `nums` into a set takes O(n^2) time because we are iterating over each subarray and converting it into a set which takes O(n) time. For the second part, the complexity of the set intersection of all elements of `nums` is `O(n^n)` since the intersection method in the worst case takes `O(len(s_1) * len(s_2) * ... * len(s_n))` where `s_1 .... s_n` are the sets being intersected. We have `n` sets and assuming each set has an average length of `n` that's how we get `n^n`. Finally sorting the result takes `O(nlogn)` time since in the worst case all the elements of one subarray appear in all the other ones thus resulting that time complexity.
+    - SC: `O(n)` because as `nums` grows in size the number of set conversions and storage also increases
+    """
+
     # Brute force solution
         # checks whether for each unique character in the first subarray whether it appears in all the subsequent
         # subarrays then updating result array with that value
@@ -186,8 +196,87 @@ def intersection(nums: List[List[int]]) -> List[int]:
     # Set solution
         # converts all subarrays into sets then takes the intersection of all of them
 
-    # nums = [set(i) for i in nums]
-    # return list(sorted(set.intersection(*nums)))
+    # nums = [set(i) for i in nums] - O(n^2)
+    # return list(sorted(set.intersection(*nums))) - O(n^n + nlogn)
 
-print(intersection([[3,1,2,4,5],[1,2,3,4],[3,4,5,6]]))
-print(intersection([[1,2,3],[4,5,6]]))
+def areOccurrencesEqual(s: str) -> bool:
+    """
+    Time complexity: O(n) - the list to set conversion including calculating the length of the set in the worst case takes place in linear time since we would be storing every single character in the hashmap if everything was unique
+    Space complexity: O(n) - in the worst case all characters are unique so we store `n` entries in the hashmap
+    """
+    occurrences = Counter(s)
+    # if all the characters appear the same number of times the values array will only contain one kind of value and if we convert that into a set we can check if its length is equal to 1 because that would mean there's only one unique value
+    return len(set(occurrences.values())) == 1 # 29ms runtime(beats 95.28%)
+
+    # 42ms runtime(beats 33.44%)
+    # keys = list(occurrences.keys())
+    # for i in range(len(keys) - 1):
+    #     if occurrences[keys[i]] != occurrences[keys[i + 1]]:
+    #         return False
+    
+    # return True
+
+# APPLICATION OF HASHING TO SLIDING WINDOW PROBLEMS WHERE A MORE STRICTER CONSTRAINT EXISTS AND FOR WHICH THE STANDARD WINDOW EXPANSION AND SHRINKING WON'T WORK
+
+def subarraySum(nums: List[int], k: int) -> int:
+    """
+    Given an array of integers `nums` and an integer `k`, return the total number of subarrays whose sum equals to `k`.
+    Time complexity: O(n) because we always iterate through every single element of `nums` and then perform the remaining operations
+    Space complexity: O(n) because in the case where we have only positive values in the array the accumulating prefix will always keep increasing and we will store `n` unique keys in the hashmap
+    """
+
+    # Main idea:
+        # In this approach we store the frequencies of prefix sums in the input array because that will be used to update how many subarrays end at a specific index i with a sum equal to k
+        # what we do is to maintain a variable to keep a track of the current prefix sum and storing it in the hashmap at each step of the iteration
+        # the way we determine if we have reached an index i that forms a subarray with sum equal to k is to check whether we have already observed the prefix sum of curr - k in the hashmap
+            # let's say the input is [1, 2, 3] and it has a prefix of [1, 3, 6] with k = 3
+            # one thing we need to make sure to do is to account for the fact that an empty subarray has a sum of 0 and to begin with it occurs only once so we create that key/value pair in the hashmap initially
+            # the prefix at index 0 is 1 and ideally if this subarray which contains just one element had a sum of k then this value - k = 0 and we check if 0 exists in the hashmap which it does since we already initialized it, however 1 - 3 = -2 doesn't exist in the hashmap as a key so this subarray doesn't have a sum equal to k
+            # now we move to index 1 and accumulate a prefix sum of 3 and we check whether currPrefix - k = 0 exists in the hashmap which it does so we increment the number of matched subarrays by the frequency associated with the prefix of an empty subarray and this logic carries over for all indices
+
+    prefix = defaultdict(int)
+    prefix[0] = 1 # this is needed because if we don't account for this then we miss counting certain valid subarrays
+    # curr is used to store the current prefix up to index i and res is used to keep track of number of subarrays with sum equal to k
+    curr = res = 0  
+    for i in nums:
+        curr += i
+        # since we're using a defaultdict object there's no need to check if the key exists because no key errors will be thrown. if the key doesn't exist the default int value which is 0 will be added to res
+        if curr - k in prefix:
+            res += prefix[curr - k]
+        prefix[curr] += 1
+    
+    return res
+
+def numberOfSubarrays(nums: List[int], k: int) -> int:
+    """
+    Time complexity: O(n) since we are iterating through the entire input array and updating hashmap at the same time
+    Space complexity: O(n) - if no duplicate prefixes exist then we store `n` unique keys in the hashmap
+    """
+    # brute force solution - TLE
+
+    # res = 0
+    # for i in range(len(nums)):
+    #     if k == 1 and nums[i] % 2 != 0:
+    #         res += 1
+    #     for j in range(i + 1, len(nums)):
+    #         n_odd = 0
+    #         curr = nums[i:j + 1]
+    #         for val in curr:
+    #             n_odd += 1 if val % 2 != 0 else 0
+    #         if n_odd == k:
+    #             res += 1
+    
+    # return res
+    
+    count = defaultdict(int) # this will store the number of odd numbers as the key and the number of subarrays containing those many odd numbers as the value
+    count[0] = 1 # this is necessary and basically indicates that there is one subarray to begin with that has 0 odd numbers which is the empty subarray
+    
+    res = curr = 0 # res keeps track of number of valid subarrays and curr keeps track of number of odd elements so far
+    for j in nums:
+        curr += 0 if j % 2 == 0 else 1 # we can technically just do curr += j % 2 since the modular div returns 1 if the number is odd and even otherwise
+        res += count[curr - k] # as of this index, curr represents the number of odd numbers we've seen till here and if curr - k exists it means that there was another subarray previously with those many odd numbers and the difference between the two results in k odd numbers being present between both the indices
+        count[curr] += 1 # this is for updating the hashmap with the number of odd numbers and number of subarrays that satisfy them
+    
+    print(dict(count))
+    
+    return res
