@@ -87,10 +87,10 @@ def add_node(node: DoublyNode, node_to_add: DoublyNode) -> None:
     node.next = node_to_add
 
 def traverse_doubly(head: DoublyNode):
-    temp = head
-    while temp:
-        print(f"The next node of {temp.val} is {temp.next.val if temp.next is not None else 'NULL'} and the previous node is {temp.prev.val if temp.prev is not None else 'NULL'}")
-        temp = temp.next
+    current = head
+    while current:
+        print(f"[{current.val}]", end=" <-> " if current.next else "")
+        current = current.next
 
 new = DoublyNode(1.5)
 
@@ -112,3 +112,70 @@ def delete_routine():
 
     print(f"List after deleting 1.5")
     traverse_doubly(doubly_head)
+
+traverse_doubly(doubly_head)
+print("\n")
+
+add_head, add_tail = DoublyNode(0.5), DoublyNode(4.5)
+
+def prepend(head: DoublyNode, node_to_add: DoublyNode) -> DoublyNode:
+    # node to be added becomes the new head
+    if not head:
+        head = node_to_add
+    
+    node_to_add.next = head
+    head.prev = node_to_add
+    head = node_to_add
+
+    return head
+
+doubly_head = prepend(doubly_head, add_head)
+traverse_doubly(doubly_head)
+print("\n")
+
+def append(tail: DoublyNode, node_to_add: DoublyNode):
+    # node to be added becomes the new tail
+    if not tail:
+        tail = node_to_add
+    
+    tail.next = node_to_add
+    node_to_add.prev = tail
+    tail = node_to_add
+
+append(double_four, add_tail)
+traverse_doubly(doubly_head)
+print("\n")
+
+def remove_from_start(head: DoublyNode):
+    if not head:
+        return
+    
+    next_node = head.next
+    if not next_node:
+        head = None
+    else:
+        next_node.prev = head.prev
+        head.next = None
+        head = next_node
+    
+    return head
+
+doubly_head = remove_from_start(add_head)
+traverse_doubly(doubly_head)
+print("\n")
+
+def remove_from_end(tail: DoublyNode):
+    if not tail:
+        return
+    
+    prev_node = tail.prev
+    if not prev_node:
+        tail = None
+    else:
+        prev_node.next = tail.next
+        tail.prev = None
+        tail = prev_node
+
+remove_from_end(add_tail)
+traverse_doubly(doubly_head)
+print("\n")
