@@ -2,10 +2,12 @@
 
 def dailyTemperatures(temperatures: list[int]) -> list[int]:
     """
-    Brute force time complexity: O(n^2)
-    Optimal solution time complexity: O(n) amortized and O(n) space time complexity to store the answer array
-
-    COME BACK TO THIS LATER TO RE-ATTEMPT
+    - Brute force
+        - Time complexity: O(n^2) because for each value in the input array we are iterating over the remainder of the array until we find a higher temperature
+        - Space complexity: O(n) to store the resulting array of all the day differences
+    - Optimal solution
+        - Time complexity: O(n) although we have a while loop inside the main loop but the while loop doesn't necessarily run `n` times for each outer iteration so it averages out to O(1) at the end giving an amortized time of O(n)
+        - Space complexity: O(n) to store the resulting array as well as the stack because the stack in the worst case can hold `n` elements if the input array is already in decreasing order
     """
     # res = []
 
