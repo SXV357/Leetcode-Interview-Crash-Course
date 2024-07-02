@@ -6,7 +6,7 @@ class StockSpanner:
 
     def next(self, price: int) -> int:
         """
-        Time complexity: O(n) amortized because the while loop need not necessarily execute for every single value in the array but at the end averages out to O(1)
+        Time complexity: O(1) amortized because the while loop need not necessarily execute for every single value in the stack but at the end averages out to O(1)
         Space complexity: O(n) because the stack could grow to have `n` elements if all the stocks were already in decreasing order to begin with
 
         COME BACK TO THIS LATER TO RE-ATTEMPT

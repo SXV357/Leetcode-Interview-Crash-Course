@@ -10,6 +10,10 @@ class MovingAverage:
         self.curr_sum = 0
 
     def next(self, val: int) -> float:
+        """
+        Time complexity: O(1) because checking length of queue, updating current sum, indexing into queue, appending to queue and the average calculation arithmetic operation all take place in constant time
+        Space complexity: O(`size`) because the queue can only store a max of `size` elements before the first one is popped off and the next element is added
+        """
         # if the max length of a queue is reached and an element is added the first element is removed and the new element is appended to maintain the same length so to simulate that, we check whether we've already reached the max length and if so subtract the first element
         if len(self.elems) == self.size:
             self.curr_sum -= self.elems[0]
