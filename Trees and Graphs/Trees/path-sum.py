@@ -3,6 +3,28 @@
 from utils import TreeNode
 from typing import Optional
 
+def pathSumRecur(root: Optional[TreeNode], targetSum: int) -> bool:
+    """
+    Pre-order recursive DFS traversal
+    """
+    def dfs(node, curr):
+        # base case: if the root is null then no path sum can exist so we return false
+        if not node:
+            return False
+        
+        # we only care about whether the path sum equals the target sum at a leaf node so if the node is a leaf node check whether the sum of all the nodes prior to this node and this node's value equals the target value
+        if not node.left and not node.right:
+            return curr + node.val == targetSum
+        
+        # this is accumulating the value of the previous node before moving onto the left and right subtrees respectively
+        curr += node.val
+
+        # reason why we use "or" is because we want just one path in the overall tree starting at the root and ending at a leaf node with the target path sum and it doesn't matter whether it is in the left subtree or the right subtree because as long as it holds true in either one we return true
+        return dfs(node.left, curr) or dfs(node.right, curr)
+    
+    # call the helper function starting at the root with an initial value of 0 since the sum of all nodes prior to the root is 0(it has no parents)
+    return dfs(root, 0)
+
 def hasPathSum(root: Optional[TreeNode], targetSum: int) -> bool:
     """
     Time complexity: O(n) because every node is visited
@@ -34,6 +56,7 @@ def hasPathSum(root: Optional[TreeNode], targetSum: int) -> bool:
 root1 = TreeNode(5, TreeNode(4, TreeNode(11, TreeNode(7), TreeNode(2)), None), TreeNode(8, TreeNode(13), TreeNode(4, None, TreeNode(1))))
 root2 = TreeNode(1, TreeNode(2), TreeNode(3))
 
-print(hasPathSum(root1, 22))
-print(hasPathSum(root2, 5))
-print(hasPathSum(None, 0))
+assert(hasPathSum(root1, 22) == pathSumRecur(root1, 22))
+assert(hasPathSum(root2, 5) == pathSumRecur(root2, 5))
+assert(hasPathSum(None, 0) == pathSumRecur(None, 0))
+print("all assertions passed successfully")
