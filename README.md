@@ -1,6 +1,6 @@
 # Leetcode Interview Crash Course - Data Structures and Algorithms
 
-Solutions to various problems in Leetcode's Interview Crash Course organized by the following topics:
+Solutions to various Leetcode problems in Python organized by the following topics:
   - Arrays and Strings
   - Hashing
   - Linked Lists
